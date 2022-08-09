@@ -21,13 +21,14 @@ let run = function() {
 }
 
 function start() {
+    state = "playing";
     for (let i = 1; i <= BALL_COUNT_INITIAL; i++) {
         spawnBall();
     }
     player.active = true;
-    state = "playing";
     gameStartMillis = Date.now() + (BALL_SPAWN_WARMUP * 1000);
     intervalId = setInterval(run, 1000 / 120);
+    Sound.MUSIC.loop();
 }
 
 function startEnd() {
@@ -40,6 +41,7 @@ function finishEnd() {
     clearInterval(intervalId);
     balls = [];
     state = "ended";
+    Sound.MUSIC.stop();
     checkHighscore(secondsSurvived);
     drawMenu();
     drawResults();
@@ -86,15 +88,19 @@ function checkCollisions(ball) {
     if (ball.position.x <= ball.radius) {
         ball.velocity = new Vector(Math.abs(ball.velocity.x), ball.velocity.y);
         ball.position = new Vector(ball.radius, ball.position.y);
+        Sound.WALL.play();
     } else if (ball.position.x >= canvas.width - ball.radius) {
         ball.velocity = new Vector(-Math.abs(ball.velocity.x), ball.velocity.y);
         ball.position = new Vector(canvas.width - ball.radius, ball.position.y);
+        Sound.WALL.play();
     } else if (ball.position.y <= ball.radius) {
         ball.velocity = new Vector(ball.velocity.x, Math.abs(ball.velocity.y))
         ball.position = new Vector(ball.position.x, ball.radius);
+        Sound.WALL.play();
     } else if (state === "playing" && ball.position.y >= canvas.height - ball.radius) {
         ball.velocity = new Vector(ball.velocity.x, -Math.abs(ball.velocity.y));
         ball.position = new Vector(ball.position.x, canvas.height - ball.radius);
+        Sound.WALL.play();
     }
 
     for (const collision of balls) {
@@ -115,6 +121,7 @@ function spawnBall() {
         ball.velocity = new Vector(BALL_SPEED_INITIAL / hypDistance * (player.position.x - ball.position.x), 
                 BALL_SPEED_INITIAL / hypDistance * (player.position.y - ball.position.y));
         ball.active = true;
+        Sound.POP.play();
     }, BALL_SPAWN_WARMUP * 1000);
 }
 

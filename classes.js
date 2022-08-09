@@ -82,6 +82,7 @@ class Ball {
 
     collide(other) {
         //console.log("Colliding" + this + " and " + other);
+        Sound.COLLIDE.play();
         this.colliding = true;
         other.colliding = true;
         this.correctOverlap(other);
@@ -95,6 +96,35 @@ class Ball {
 
         this.velocity = this.velocity.add(collision.mult(bci - aci));
         other.velocity = other.velocity.add(collision.mult(aci - bci));
+    }
+
+}
+
+class Sound {
+    static COLLIDE = new Sound("collide.wav");
+    static WALL = new Sound("wall.wav");
+    static POP = new Sound("pop.wav");
+    static MUSIC = new Sound("music.wav");
+
+    constructor(file) {
+        this.file = file;
+        this.audio = new Audio("audio/" + file);
+    }
+
+    play() {
+        this.audio.currentTime = 0;
+        this.audio.play();
+    }
+
+    loop() {
+        this.audio.addEventListener('ended', function() {
+            this.play();
+        }, false);
+        this.play();
+    }
+
+    stop() {
+        this.audio.pause();
     }
 
 }
