@@ -128,3 +128,17 @@ class Sound {
     }
 
 }
+
+class Color {
+    static DARK_TEXT = new Color("#E8E8E8");
+    static DARK_BALL = new Color("#FF0266");
+    static DARK_PLAYER = new Color("#03DAC6");
+
+    static LIGHT_TEXT = new Color("black");
+    static LIGHT_BALL = new Color("red");
+    static LIGHT_PLAYER = new Color("blue");
+
+    constructor(value) {
+        this.value = value;
+    }
+}

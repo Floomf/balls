@@ -15,6 +15,10 @@ let gameStartMillis;
 let lastBallSpawnMillis;
 let secondsSurvived;
 
+let ballColor;
+let playerColor;
+let textColor;
+
 let run = function() {
     update();
     drawGame();
@@ -133,7 +137,7 @@ function drawGame() {
         ctx.beginPath();
         ctx.arc(ball.position.x, ball.position.y, ball.radius - 1, 0, Math.PI * 2, false);
         if (ball.active) {
-            ctx.fillStyle = "red";
+            ctx.fillStyle = ballColor;
             ctx.fill();
             ctx.stroke();
         } else {
@@ -142,7 +146,7 @@ function drawGame() {
         }
     
     }
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = playerColor;
     ctx.beginPath();
     ctx.arc(player.position.x, player.position.y, player.radius - 1, 0, Math.PI * 2, false);
     ctx.fill();
@@ -152,15 +156,19 @@ function drawGame() {
 function drawMenu() {
     ctx.textAlign = "center";
     ctx.font = "bold 120px sans-serif";
-    ctx.fillStyle = "red";
+    ctx.fillStyle = ballColor;
     ctx.fillText("Balls", canvas.width / 2, canvas.height / 2 - 25, canvas.width);
     ctx.font = "40px sans-serif";
-    ctx.fillStyle = "blue";
-    ctx.fillText("Click to Play", canvas.width / 2, canvas.height / 2 + 50, canvas.width);
+    ctx.fillStyle = playerColor;
+    ctx.fillText("Click to Play", canvas.width / 2, canvas.height / 2 + 45, canvas.width);
+    ctx.font = "15px sans-serif";
+    ctx.fillStyle = textColor;
+    ctx.fillText("(Press C to Swap Themes)", canvas.width / 2, canvas.height / 2 + 80, canvas.width);
+
 }
 
 function drawResults() {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = textColor;
     ctx.font = "bold 20px sans-serif";
     ctx.fillText("Game over!", canvas.width / 2, 40);
     ctx.font = "20px sans-serif";
@@ -169,9 +177,8 @@ function drawResults() {
 }
 
 function drawHighscore() {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = textColor;
     ctx.font = "bold 20px sans-serif";
-    ctx.textDecoration = "underline";
     ctx.fillText("Your Best:", canvas.width / 2, canvas.height - 60);
     ctx.font = "20px sans-serif";
     ctx.fillText(`${localStorage.getItem("hs")}s (${getBallCount(localStorage.getItem("hs"))} balls)`, 
@@ -208,6 +215,47 @@ function movePlayer(e) {
     player.position = new Vector(x, y);
 }
 
+function swapTheme() {
+    if (localStorage.getItem("theme") === "light") {
+        localStorage.setItem("theme", "dark");
+        document.body.classList.remove("light");
+        canvas.classList.remove("light");
+    } else {
+        localStorage.setItem("theme", "light");
+        document.body.classList.remove("dark");
+        canvas.classList.remove("dark");
+    }
+    loadTheme();
+}
+
+function loadTheme() {
+    if (localStorage.getItem("theme") === "light") {
+        textColor = Color.LIGHT_TEXT.value;
+        ballColor = Color.LIGHT_BALL.value;
+        playerColor = Color.LIGHT_PLAYER.value;
+        document.body.classList.add("light");
+        canvas.classList.add("light");
+    } else {
+        textColor = Color.DARK_TEXT.value;
+        ballColor = Color.DARK_BALL.value;
+        playerColor = Color.DARK_PLAYER.value;
+        document.body.classList.add("dark");
+        canvas.classList.add("dark");
+    }
+
+    if (state === "ended") {
+        drawMenu();
+        if (secondsSurvived !== undefined) {
+            drawResults();
+        }
+        if (localStorage.getItem("hs") !== null) {
+            drawHighscore();
+        }
+    }
+}
+
+
+
 document.body.addEventListener("mousemove", e => {
     if (state === "playing") {
         movePlayer(e);
@@ -218,6 +266,13 @@ document.getElementById("game").addEventListener("click", () => {
         start();
     }
 });
+document.body.addEventListener("keypress", e => {
+    if (e.key === "c") {
+        swapTheme();
+    }
+});
+
+loadTheme();
 drawMenu();
 if (localStorage.getItem("hs") !== null) {
     drawHighscore();
