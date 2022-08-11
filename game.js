@@ -157,10 +157,13 @@ function drawMenu() {
     ctx.textAlign = "center";
     ctx.font = "bold 120px sans-serif";
     ctx.fillStyle = ballColor;
+    ctx.lineWidth = 1;
     ctx.fillText("Balls", canvas.width / 2, canvas.height / 2 - 25, canvas.width);
-    ctx.font = "40px sans-serif";
+    ctx.strokeText("Balls", canvas.width / 2, canvas.height / 2 - 25, canvas.width);
+    ctx.font = "bold 40px sans-serif";
     ctx.fillStyle = playerColor;
     ctx.fillText("Click to Play", canvas.width / 2, canvas.height / 2 + 45, canvas.width);
+    ctx.strokeText("Click to Play", canvas.width / 2, canvas.height / 2 + 45, canvas.width);
     ctx.font = "15px sans-serif";
     ctx.fillStyle = textColor;
     ctx.fillText("(Press C to Swap Themes)", canvas.width / 2, canvas.height / 2 + 80, canvas.width);
@@ -256,7 +259,7 @@ function loadTheme() {
 
 
 
-document.body.addEventListener("mousemove", e => {
+document.addEventListener("mousemove", e => {
     if (state === "playing") {
         movePlayer(e);
     }
