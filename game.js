@@ -4,16 +4,19 @@ const BALL_RADIUS = 20;
 const BALL_COUNT_INITIAL = 4;
 const BALL_SPEED_INITIAL = 3;
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const gameCanvas = document.getElementById("game");
+const statsCanvas = document.getElementById("stats");
+const ctxGame = gameCanvas.getContext("2d");
+const ctxStats = statsCanvas.getContext("2d");
 
-let intervalId;
+let gameIntervalId;
+let statsIntervalId;
 let balls = [];
 let player = new Ball(new Vector(0, 0), new Vector(0, 0), BALL_RADIUS);
 let state = "ended";
 let gameStartMillis;
 let lastBallSpawnMillis;
-let secondsSurvived;
+let secondsSurvived = 0;
 
 let ballColor;
 let playerColor;
@@ -31,7 +34,11 @@ function start() {
     }
     player.active = true;
     gameStartMillis = Date.now() + (BALL_SPAWN_WARMUP * 1000);
-    intervalId = setInterval(run, 1000 / 120);
+    gameIntervalId = setInterval(run, 1000 / 120);
+    ctxStats.clearRect(0, 0, statsCanvas.width / 2, statsCanvas.height);
+    setTimeout(() => {
+        statsIntervalId = setInterval(drawStats, 1000);
+    }, (BALL_SPAWN_WARMUP - 1) * 1000);
     Sound.MUSIC.loop();
 }
 
@@ -39,10 +46,11 @@ function startEnd() {
     balls.push(player);
     state = "ending";
     secondsSurvived = Math.floor((Date.now() - gameStartMillis) / 1000);
+    clearInterval(statsIntervalId);
 }
 
 function finishEnd() {
-    clearInterval(intervalId);
+    clearInterval(gameIntervalId);
     balls = [];
     state = "ended";
     Sound.MUSIC.stop();
@@ -70,7 +78,7 @@ function update() {
     } else if (state === "ending") {
         let ballOnScreen = false;
         for (const ball of balls) {
-            if (ball.position.y < canvas.height + 400) {
+            if (ball.position.y < gameCanvas.height + 400) {
                 ballOnScreen = true;
                 break;
             }
@@ -93,17 +101,17 @@ function checkCollisions(ball) {
         ball.velocity = new Vector(Math.abs(ball.velocity.x), ball.velocity.y);
         ball.position = new Vector(ball.radius, ball.position.y);
         Sound.WALL.play();
-    } else if (ball.position.x >= canvas.width - ball.radius) {
+    } else if (ball.position.x >= gameCanvas.width - ball.radius) {
         ball.velocity = new Vector(-Math.abs(ball.velocity.x), ball.velocity.y);
-        ball.position = new Vector(canvas.width - ball.radius, ball.position.y);
+        ball.position = new Vector(gameCanvas.width - ball.radius, ball.position.y);
         Sound.WALL.play();
     } else if (ball.position.y <= ball.radius) {
         ball.velocity = new Vector(ball.velocity.x, Math.abs(ball.velocity.y))
         ball.position = new Vector(ball.position.x, ball.radius);
         Sound.WALL.play();
-    } else if (state === "playing" && ball.position.y >= canvas.height - ball.radius) {
+    } else if (state === "playing" && ball.position.y >= gameCanvas.height - ball.radius) {
         ball.velocity = new Vector(ball.velocity.x, -Math.abs(ball.velocity.y));
-        ball.position = new Vector(ball.position.x, canvas.height - ball.radius);
+        ball.position = new Vector(ball.position.x, gameCanvas.height - ball.radius);
         Sound.WALL.play();
     }
 
@@ -115,8 +123,8 @@ function checkCollisions(ball) {
 }
 
 function spawnBall() {
-    const ball = new Ball(new Vector(Math.floor(Math.random() * (canvas.width - 100)) + 50, 
-            Math.floor(Math.random() * (canvas.height - 100)) + 50), 
+    const ball = new Ball(new Vector(Math.floor(Math.random() * (gameCanvas.width - 100)) + 50, 
+            Math.floor(Math.random() * (gameCanvas.height - 100)) + 50), 
             new Vector(0, 0), BALL_RADIUS);
     balls.push(ball);
     lastBallSpawnMillis = Date.now();
@@ -131,62 +139,76 @@ function spawnBall() {
 
 function drawGame() {
     if (state === "ended") return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth = 2;
+    ctxGame.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+    ctxGame.lineWidth = 2;
     for (const ball of balls) {
-        ctx.beginPath();
-        ctx.arc(ball.position.x, ball.position.y, ball.radius - 1, 0, Math.PI * 2, false);
+        ctxGame.beginPath();
+        ctxGame.arc(ball.position.x, ball.position.y, ball.radius - 1, 0, Math.PI * 2, false);
         if (ball.active) {
-            ctx.fillStyle = ballColor;
-            ctx.fill();
-            ctx.stroke();
+            ctxGame.fillStyle = ballColor;
+            ctxGame.fill();
+            ctxGame.stroke();
         } else {
-            ctx.fillStyle = "gray";
-            ctx.fill();
+            ctxGame.fillStyle = "gray";
+            ctxGame.fill();
         }
-    
     }
-    ctx.fillStyle = playerColor;
-    ctx.beginPath();
-    ctx.arc(player.position.x, player.position.y, player.radius - 1, 0, Math.PI * 2, false);
-    ctx.fill();
-    ctx.stroke();
+    ctxGame.fillStyle = playerColor;
+    ctxGame.beginPath();
+    ctxGame.arc(player.position.x, player.position.y, player.radius - 1, 0, Math.PI * 2, false);
+    ctxGame.fill();
+    ctxGame.stroke();
 }
 
-function drawMenu() {
-    ctx.textAlign = "center";
-    ctx.font = "bold 120px sans-serif";
-    ctx.fillStyle = ballColor;
-    ctx.lineWidth = 1;
-    ctx.fillText("Balls", canvas.width / 2, canvas.height / 2 - 25, canvas.width);
-    ctx.strokeText("Balls", canvas.width / 2, canvas.height / 2 - 25, canvas.width);
-    ctx.font = "bold 40px sans-serif";
-    ctx.fillStyle = playerColor;
-    ctx.fillText("Click to Play", canvas.width / 2, canvas.height / 2 + 45, canvas.width);
-    ctx.strokeText("Click to Play", canvas.width / 2, canvas.height / 2 + 45, canvas.width);
-    ctx.font = "15px sans-serif";
-    ctx.fillStyle = textColor;
-    ctx.fillText("(Press C to Swap Themes)", canvas.width / 2, canvas.height / 2 + 80, canvas.width);
-
-}
-
-function drawResults() {
-    ctx.fillStyle = textColor;
-    ctx.font = "bold 20px sans-serif";
-    ctx.fillText("Game over!", canvas.width / 2, 40);
-    ctx.font = "20px sans-serif";
-    ctx.fillText(`Time alive: ${secondsSurvived}s (${getBallCount(secondsSurvived)} balls)`, 
-            canvas.width / 2, 70);
+function drawStats() { 
+    ctxStats.textAlign = "center";
+    ctxStats.clearRect(0, 0, statsCanvas.width / 2, statsCanvas.height);
+    ctxStats.font = "24px sans-serif";
+    ctxStats.fillStyle = playerColor;
+    ctxStats.fillText("Time", statsCanvas.width / 8, 40);
+    ctxStats.fillText("Balls", 3 * statsCanvas.width / 8, 40);
+    ctxStats.fillStyle = textColor;
+    ctxStats.fillText(Math.floor((Date.now() - gameStartMillis) / 1000) + "s", statsCanvas.width / 8, 75);
+    ctxStats.fillText(getBallCount(Math.floor((Date.now() - gameStartMillis) / 1000)), 3 * statsCanvas.width / 8, 75);
 }
 
 function drawHighscore() {
-    ctx.fillStyle = textColor;
-    ctx.font = "bold 20px sans-serif";
-    ctx.fillText("Your Best:", canvas.width / 2, canvas.height - 60);
-    ctx.font = "20px sans-serif";
-    ctx.fillText(`${localStorage.getItem("hs")}s (${getBallCount(localStorage.getItem("hs"))} balls)`, 
-            canvas.width / 2, canvas.height - 30);
+    ctxStats.clearRect(statsCanvas.width, 0, statsCanvas.width / 2, statsCanvas.height);
+    ctxStats.textAlign = "center";
+    ctxStats.font = "24px sans-serif";
+    ctxStats.fillStyle = ballColor;
+    ctxStats.fillText("Best Time", 5 * statsCanvas.width / 8, 40);
+    ctxStats.fillText("Most Balls", 7 * statsCanvas.width / 8, 40);
+    ctxStats.fillStyle = textColor;
+    ctxStats.fillText(localStorage.getItem("hs") + "s", 5 * statsCanvas.width / 8, 75);
+    ctxStats.fillText(getBallCount(parseInt(localStorage.getItem("hs"))), 7 * statsCanvas.width / 8, 75);
 }
+
+function drawMenu() {
+    ctxGame.textAlign = "center";
+    if (secondsSurvived > 0) {
+        ctxGame.fillStyle = textColor;
+        ctxGame.font = "bold 28px sans-serif";
+        ctxGame.fillText("Game over!", gameCanvas.width / 2, 80);
+    }
+    ctxGame.font = "bold 120px sans-serif";
+    ctxGame.fillStyle = ballColor;
+    ctxGame.lineWidth = 1;
+    ctxGame.fillText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
+    ctxGame.strokeText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
+    ctxGame.font = "bold 40px sans-serif";
+    ctxGame.fillStyle = playerColor;
+    ctxGame.fillText("Click to Play", gameCanvas.width / 2, gameCanvas.height / 2 + 45);
+    ctxGame.strokeText("Click to Play", gameCanvas.width / 2, gameCanvas.height / 2 + 45);
+    ctxGame.font = "18px sans-serif";
+    ctxGame.fillStyle = textColor;
+    ctxGame.textAlign = "left";
+    ctxGame.fillText("Created by Floomf", 16, gameCanvas.height - 40);
+    ctxGame.fillText("Music by Spicyspaceman1", 16, gameCanvas.height - 16);
+    ctxGame.textAlign = "right";
+    ctxGame.fillText("Press C to Swap Themes", gameCanvas.width - 16, gameCanvas.height - 16);
+}
+
 function checkHighscore(score) {
     if (localStorage.getItem("hs") < secondsSurvived) {
         localStorage.setItem("hs", secondsSurvived);
@@ -199,20 +221,20 @@ function getBallCount(secondsSurvived) {
 }
 
 function movePlayer(e) {
-    const rect = canvas.getBoundingClientRect();
+    const rect = gameCanvas.getBoundingClientRect();
     let x = e.clientX - rect.x;
     let y = e.clientY - rect.y;
 
     if (x < player.radius) {
         x = player.radius;
-    } else if (x > canvas.width - player.radius) {
-        x = canvas.width - player.radius;
+    } else if (x > gameCanvas.width - player.radius) {
+        x = gameCanvas.width - player.radius;
     }
 
     if (y < player.radius) {
         y = player.radius;
-    } else if (y > canvas.height - player.radius) {
-        y = canvas.height - player.radius;
+    } else if (y > gameCanvas.height - player.radius) {
+        y = gameCanvas.height - player.radius;
     }
 
     player.position = new Vector(x, y);
@@ -222,11 +244,13 @@ function swapTheme() {
     if (localStorage.getItem("theme") === "light") {
         localStorage.setItem("theme", "dark");
         document.body.classList.remove("light");
-        canvas.classList.remove("light");
+        gameCanvas.classList.remove("light");
+        statsCanvas.classList.remove("light");
     } else {
         localStorage.setItem("theme", "light");
         document.body.classList.remove("dark");
-        canvas.classList.remove("dark");
+        gameCanvas.classList.remove("dark");
+        statsCanvas.classList.remove("dark");
     }
     loadTheme();
 }
@@ -237,27 +261,28 @@ function loadTheme() {
         ballColor = Color.LIGHT_BALL.value;
         playerColor = Color.LIGHT_PLAYER.value;
         document.body.classList.add("light");
-        canvas.classList.add("light");
+        gameCanvas.classList.add("light");
+        statsCanvas.classList.add("light");
     } else {
         textColor = Color.DARK_TEXT.value;
         ballColor = Color.DARK_BALL.value;
         playerColor = Color.DARK_PLAYER.value;
         document.body.classList.add("dark");
-        canvas.classList.add("dark");
+        gameCanvas.classList.add("dark");
+        statsCanvas.classList.add("dark");
     }
 
     if (state === "ended") {
         drawMenu();
-        if (secondsSurvived !== undefined) {
-            drawResults();
-        }
-        if (localStorage.getItem("hs") !== null) {
-            drawHighscore();
-        }
+    } 
+    if (state === "playing" || secondsSurvived > 0) { //TODO fix
+        drawStats();
+    }
+
+    if (localStorage.getItem("hs") !== null) {
+        drawHighscore();
     }
 }
-
-
 
 document.addEventListener("mousemove", e => {
     if (state === "playing") {
@@ -276,7 +301,3 @@ document.body.addEventListener("keypress", e => {
 });
 
 loadTheme();
-drawMenu();
-if (localStorage.getItem("hs") !== null) {
-    drawHighscore();
-}

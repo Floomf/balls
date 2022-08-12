@@ -109,6 +109,7 @@ class Sound {
     constructor(file) {
         this.file = file;
         this.audio = new Audio("audio/" + file);
+        this.audio.volume = 0.75;
     }
 
     play() {
