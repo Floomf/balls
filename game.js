@@ -185,7 +185,7 @@ function drawStats() {
 }
 
 function drawHighscore() {
-    ctxStats.clearRect(statsCanvas.width, 0, statsCanvas.width / 2, statsCanvas.height);
+    ctxStats.clearRect(statsCanvas.width / 2, 0, statsCanvas.width, statsCanvas.height);
     ctxStats.textAlign = "center";
     ctxStats.font = "24px Varela Round";
     ctxStats.fillStyle = ballColor;
