@@ -148,9 +148,9 @@ function drawGame() {
     ctxGame.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     ctxGame.lineWidth = 2;
     ctxGame.shadowColor = "black";
-    ctxGame.shadowBlur = 3;
-    ctxGame.shadowOffsetX = 2;
-    ctxGame.shadowOffsetY = 2;
+    ctxGame.shadowBlur = 1;
+    ctxGame.shadowOffsetX = 1;
+    ctxGame.shadowOffsetY = 1;
 
     for (const ball of balls) {
         ctxGame.beginPath();
@@ -206,7 +206,7 @@ function drawMenu() {
     }
     ctxGame.font = 'bold 128px Varela Round';
     ctxGame.fillStyle = ballColor;
-    ctxGame.lineWidth = 3;
+    ctxGame.lineWidth = 1;
     ctxGame.fillText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
     ctxGame.strokeText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
     ctxGame.font = "bold 48px Varela Round";
