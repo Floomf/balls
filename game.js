@@ -59,6 +59,7 @@ function startEnd() {
 function finishEnd() {
     clearInterval(gameIntervalId);
     balls = [];
+    player.position = new Vector(gameCanvas.width / 2, gameCanvas.height / 2); //prevent spawning out of zone
     state = "ended";
     Sound.MUSIC.stop();
     checkHighscore(secondsSurvived);
