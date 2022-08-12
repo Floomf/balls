@@ -56,7 +56,6 @@ function finishEnd() {
     Sound.MUSIC.stop();
     checkHighscore(secondsSurvived);
     drawMenu();
-    drawResults();
     drawHighscore();
 }
 
@@ -193,7 +192,7 @@ function drawMenu() {
     }
     ctxGame.font = "bold 120px sans-serif";
     ctxGame.fillStyle = ballColor;
-    ctxGame.lineWidth = 1;
+    ctxGame.lineWidth = 2;
     ctxGame.fillText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
     ctxGame.strokeText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
     ctxGame.font = "bold 40px sans-serif";
