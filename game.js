@@ -22,6 +22,13 @@ let ballColor;
 let playerColor;
 let textColor;
 
+let f = new FontFace("Varela Round", "url(https://fonts.gstatic.com/s/varelaround/v19/w8gdH283Tvk__Lua32TysjIfp8uP.woff2)")
+
+f.load().then(font => {
+    document.fonts.add(font);
+    loadTheme();
+}, err => console.log(err));
+
 let run = function() {
     update();
     drawGame();
@@ -140,6 +147,11 @@ function drawGame() {
     if (state === "ended") return;
     ctxGame.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     ctxGame.lineWidth = 2;
+    ctxGame.shadowColor = "black";
+    ctxGame.shadowBlur = 3;
+    ctxGame.shadowOffsetX = 2;
+    ctxGame.shadowOffsetY = 2;
+
     for (const ball of balls) {
         ctxGame.beginPath();
         ctxGame.arc(ball.position.x, ball.position.y, ball.radius - 1, 0, Math.PI * 2, false);
@@ -157,12 +169,13 @@ function drawGame() {
     ctxGame.arc(player.position.x, player.position.y, player.radius - 1, 0, Math.PI * 2, false);
     ctxGame.fill();
     ctxGame.stroke();
+    ctxGame.shadowColor = "black";
 }
 
 function drawStats() { 
-    ctxStats.textAlign = "center";
     ctxStats.clearRect(0, 0, statsCanvas.width / 2, statsCanvas.height);
-    ctxStats.font = "24px sans-serif";
+    ctxStats.textAlign = "center";
+    ctxStats.font = "24px Varela Round";
     ctxStats.fillStyle = playerColor;
     ctxStats.fillText("Time", statsCanvas.width / 8, 40);
     ctxStats.fillText("Balls", 3 * statsCanvas.width / 8, 40);
@@ -174,32 +187,33 @@ function drawStats() {
 function drawHighscore() {
     ctxStats.clearRect(statsCanvas.width, 0, statsCanvas.width / 2, statsCanvas.height);
     ctxStats.textAlign = "center";
-    ctxStats.font = "24px sans-serif";
+    ctxStats.font = "24px Varela Round";
     ctxStats.fillStyle = ballColor;
-    ctxStats.fillText("Best Time", 5 * statsCanvas.width / 8, 40);
-    ctxStats.fillText("Most Balls", 7 * statsCanvas.width / 8, 40);
+    ctxStats.fillText("Best Time", 5 * statsCanvas.width / 8, 39);
+    ctxStats.fillText("Most Balls", 7 * statsCanvas.width / 8, 39);
     ctxStats.fillStyle = textColor;
-    ctxStats.fillText(localStorage.getItem("hs") + "s", 5 * statsCanvas.width / 8, 75);
-    ctxStats.fillText(getBallCount(parseInt(localStorage.getItem("hs"))), 7 * statsCanvas.width / 8, 75);
+    ctxStats.fillText(localStorage.getItem("hs") + "s", 5 * statsCanvas.width / 8, 73);
+    ctxStats.fillText(getBallCount(parseInt(localStorage.getItem("hs"))), 7 * statsCanvas.width / 8, 73);
 }
 
 function drawMenu() {
     ctxGame.textAlign = "center";
+    ctxGame.shadowColor = "rgba(0,0,0,0)";
     if (secondsSurvived > 0) {
         ctxGame.fillStyle = textColor;
-        ctxGame.font = "bold 28px sans-serif";
+        ctxGame.font = "bold 28px Varela Round";
         ctxGame.fillText("Game over!", gameCanvas.width / 2, 80);
     }
-    ctxGame.font = "bold 120px sans-serif";
+    ctxGame.font = 'bold 128px Varela Round';
     ctxGame.fillStyle = ballColor;
-    ctxGame.lineWidth = 2;
+    ctxGame.lineWidth = 3;
     ctxGame.fillText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
     ctxGame.strokeText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
-    ctxGame.font = "bold 40px sans-serif";
+    ctxGame.font = "bold 48px Varela Round";
     ctxGame.fillStyle = playerColor;
     ctxGame.fillText("Click to Play", gameCanvas.width / 2, gameCanvas.height / 2 + 45);
     ctxGame.strokeText("Click to Play", gameCanvas.width / 2, gameCanvas.height / 2 + 45);
-    ctxGame.font = "18px sans-serif";
+    ctxGame.font = "18px Varela Round";
     ctxGame.fillStyle = textColor;
     ctxGame.textAlign = "left";
     ctxGame.fillText("Created by Floomf", 16, gameCanvas.height - 40);
@@ -298,5 +312,3 @@ document.body.addEventListener("keypress", e => {
         swapTheme();
     }
 });
-
-loadTheme();
