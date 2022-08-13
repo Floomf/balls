@@ -203,7 +203,7 @@ function drawMenu() {
     if (secondsSurvived > 0) {
         ctxGame.fillStyle = textColor;
         ctxGame.font = "bold 28px Varela Round";
-        ctxGame.fillText("Game over!", gameCanvas.width / 2, 80);
+        ctxGame.fillText("Game over!", gameCanvas.width / 2, 60);
     }
     ctxGame.font = 'bold 128px Varela Round';
     ctxGame.fillStyle = ballColor;
@@ -226,7 +226,10 @@ function drawMenu() {
 function checkHighscore(score) {
     if (localStorage.getItem("hs") < secondsSurvived) {
         localStorage.setItem("hs", secondsSurvived);
-        window.alert(`NEW HIGH SCORE!\n\nYou survived ${secondsSurvived} seconds and got to ${getBallCount(secondsSurvived)} balls!`);
+        ctxGame.textAlign = "center";
+        ctxGame.fillStyle = ballColor;
+        ctxGame.font = "bold 28px Varela Round";
+        ctxGame.fillText("NEW HIGH SCORE!", gameCanvas.width / 2, 100);
     }
 }
 
