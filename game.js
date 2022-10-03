@@ -205,11 +205,11 @@ function drawMenu() {
         ctxGame.font = "bold 28px Varela Round";
         ctxGame.fillText("Game over!", gameCanvas.width / 2, 60);
     }
-    ctxGame.font = 'bold 128px Varela Round';
+    ctxGame.font = 'bold 96px Varela Round';
     ctxGame.fillStyle = ballColor;
     ctxGame.lineWidth = 1;
-    ctxGame.fillText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
-    ctxGame.strokeText("Balls", gameCanvas.width / 2, gameCanvas.height / 2 - 25);
+    ctxGame.fillText("Dodgeball", gameCanvas.width / 2, gameCanvas.height / 2 - 35);
+    ctxGame.strokeText("Dodgeball", gameCanvas.width / 2, gameCanvas.height / 2 - 35);
     ctxGame.font = "bold 48px Varela Round";
     ctxGame.fillStyle = playerColor;
     ctxGame.fillText("Click to Play", gameCanvas.width / 2, gameCanvas.height / 2 + 45);
