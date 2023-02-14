@@ -216,11 +216,7 @@ function drawMenu() {
     ctxGame.strokeText("Click to Play", gameCanvas.width / 2, gameCanvas.height / 2 + 45);
     ctxGame.font = "18px Varela Round";
     ctxGame.fillStyle = textColor;
-    ctxGame.textAlign = "left";
-    ctxGame.fillText("Created by Floomf", 16, gameCanvas.height - 40);
-    ctxGame.fillText("Music by Spicyspaceman1", 16, gameCanvas.height - 16);
-    ctxGame.textAlign = "right";
-    ctxGame.fillText("Press C to Swap Themes", gameCanvas.width - 16, gameCanvas.height - 16);
+    ctxGame.fillText("Press C to Swap Themes", gameCanvas.width / 2, gameCanvas.height - 16);
 }
 
 function checkHighscore(score) {
